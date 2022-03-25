@@ -24,14 +24,15 @@ The project is designed to visualize data extracted from crypto market
 
 * [Flask](https://flask.palletsprojects.com/)
 * [Python](https://www.python.org/)
-* [SQLite](https://www.sqlite.org/)
-* [Plotly](https://plotly.com/)
+* [Dash](https://dash.plotly.com/)
 * [Bootstrap](https://getbootstrap.com)
-* [JavaScript](https://www.javascript.com/)
 
 ## Prerequisites
 
-In order to install all the dependencies required in the project we will use pip, which is a package management system for the Python language environment
+In order to use following repository, at the moment you'll need to use any Linux distribution.
+We'll be using pip as the main package manager toinstall all the dependencies required in the project we will use pip, 
+which is a package management system for the Python language environment
+
 * PIP
   ```sh
   sudo apt install python3-pip
@@ -43,13 +44,18 @@ In order to install all the dependencies required in the project we will use pip
    ```sh
    git clone https://github.com/Thhprx3/Flask_IO.git
    ```
+3. Create virtual env
+   ```
+   virtualenv venv
+   ```
 2. Install all necessary dependencies used in the project
    ```sh
    sudo pip install -r requirements.txt
 3. Set environment variables for development
    ```sh
    export FLASK_ENV=development
-   export FLASK_APP=app.py
+   export FLASK_APP=server_start.py
+   export FLASK_DEBUG=1
    ```
 4. Start the development server
    ```js
@@ -59,3 +65,16 @@ In order to install all the dependencies required in the project we will use pip
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+## TODO
+
+- [x] Basic template
+- [x] Integrate Dash + Flask
+- [ ] Static data collection
+- [ ] Extend data collection
+- [ ] Include options/sliders for charts
+- [ ] First Gunicorn deployment on Heroku
+- [ ] Data preparation for keras/tensorflow
+- [ ] Building first AI model
+- [ ] Implementing predictions
+- [ ] tbd
