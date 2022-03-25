@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+
+*{
+    font-family: 'Poppins', sans-serif;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+:root
+{
+    --bg-nav: #4e73df;
+    --bg-content: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+}
+.nav-link{
+    color: #fff;
+}
+
+.nav-tabs, .nav-tabs .nav-link.active {
+    border-bottom: 3px solid var(--bg-nav);
+    color: var(--bg-nav);
+}
