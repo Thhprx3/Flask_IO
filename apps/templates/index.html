@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "layout/base.html" %}
 
 {% block title %} Dashboard {% endblock title %}
 
@@ -7,7 +7,7 @@
 {% endblock stylesheets %}
 
 {% block content %}
-<div class="row text-center">
+<div class="row text-center flex-grow-1">
     <div class="col-12 mb-4">
         <div class="card border-1 shadow">
             <hr class="featurette-divider">
@@ -16,7 +16,6 @@
             </div>
             <hr class="featurette-divider">
         </div>
-       </div>
     </div>
 </div>
 {% block js %}
