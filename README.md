@@ -10,21 +10,20 @@
 </p>
   
 <div align="center">
-  <h3 align="center">Flask Project</h3>
+  <h3 align="center">Dashboard with Python Dash</h3>
   <p align="center">
-    First steps in Flask framework!
+    Simple cryptocurrency dashboard created using the Dash framework
   </p>
 </div>
 
 ## About
 
-The project is designed to visualize data extracted from crypto market
+The project is designed to visualize data extracted from [CoinMarketCap](https://coinmarketcap.com/)
 
 ### Software
 
-* [Flask](https://flask.palletsprojects.com/)
-* [Python](https://www.python.org/)
 * [Dash](https://dash.plotly.com/)
+* [Python](https://www.python.org/)
 * [Bootstrap](https://getbootstrap.com)
 
 ## Prerequisites
@@ -33,33 +32,74 @@ In order to use following repository, at the moment you'll need to use any Linux
 We'll be using pip as the main package manager toinstall all the dependencies required in the project we will use pip, 
 which is a package management system for the Python language environment
 
-* PIP
-  ```sh
-  sudo apt install python3-pip
-  ```
+1. Windows
+  * PIP
+    ```
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    python get-pip.py
+    ```
+  * Virtualenv
+    ```
+    pip install virtualenv 
+    ```
+  
+2. Linux  
+  * PIP
+    ```sh
+    sudo apt-get install python3-pip
+    ```
+  * Virtualenv
+    ```
+    sudo pip install virtualenv 
+    ```
 
 ### Installation
-
+## Windows
 1. Clone the repo
    ```sh
    git clone https://github.com/Thhprx3/Flask_IO.git
    ```
 3. Create virtual env
-   ```
-   virtualenv venv
+   ```sh
+   python3 -m venv .venv
+   source venv/bin/activate
    ```
 2. Install all necessary dependencies used in the project
    ```sh
    sudo pip install -r requirements.txt
-3. Set environment variables for development
+4. Start the development server
+   * Locally
    ```sh
-   export FLASK_ENV=development
-   export FLASK_APP=server_start.py
-   export FLASK_DEBUG=1
+   python3 start_server.py
+   ```
+   * Gunicorn
+   ```sh
+   pip install gunicorn
+   ```
+---
+## Linux
+1. Clone the repo
+   ```sh
+   git clone https://github.com/Thhprx3/Flask_IO.git
+   ```
+3. Create virtual env
+   ```sh
+   python3 -m venv .venv
+   source venv/bin/activate
+   ```
+2. Install all necessary dependencies used in the project
+   ```sh
+   sudo pip install -r requirements.txt
    ```
 4. Start the development server
-   ```js
-   flask run
+   * Locally
+   ```sh
+   python3 start_server.py
+   ```
+   * Gunicorn
+   ```sh
+   pip install gunicorn
+   gunicorn start_server:app.server
    ```
 
 ## License
@@ -68,12 +108,12 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## TODO
 
-- [x] Basic template
-- [x] Integrate Dash + Flask
-- [ ] Static data collection
-- [ ] Extend data collection
-- [ ] Include options/sliders for charts
-- [ ] First Gunicorn deployment on Heroku
+- [x] Page template
+- [x] Integrate Dash
+- [x] Static data collection
+- [x] Extend data collection
+- [x] Include options/sliders for charts
+- [x] First Gunicorn deployment on Heroku
 - [ ] Data preparation for keras/tensorflow
 - [ ] Building first AI model
 - [ ] Implementing predictions
