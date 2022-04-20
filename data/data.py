@@ -62,18 +62,10 @@ def get_info(symbol):
     return info
 
 
-def price_conversion(symbol, convert):
-    api_url="https://web-api.coinmarketcap.com/v2/tools/price-conversion?amount=1&symbol={}&convert={}".format(
+def price_changes(symbol, convert):
+    api_url = "https://web-api.coinmarketcap.com/v2/cryptocurrency/price-performance-stats/latest?symbol={}&convert={}&time_period=24h".format(
         symbol, convert
     )
-    response = requests.get(api_url).json()['data']
-    data = pd.json_normalize(response)
-    data.rename(columns=lambda x: x.replace('quote.'+convert.upper()+'.',''), inplace=True)
-    return data
-
-
-def price_changes(symbol):
-    api_url = "https://web-api.coinmarketcap.com/v2/cryptocurrency/price-performance-stats/latest?symbol={}&time_period=24h".format(symbol)
     response = requests.get(api_url).json()['data'][symbol.upper()]
     data = pd.json_normalize(response)
     data.rename(columns=lambda x: re.sub(".*(?=\.).","",x), inplace=True)

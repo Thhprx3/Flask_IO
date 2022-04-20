@@ -4,7 +4,7 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input
 
-from data.data import get_coin_list, get_first_date, get_fiat_list, historical_data, get_info, price_conversion, price_changes
+from data.data import get_coin_list, get_first_date, get_fiat_list, historical_data, get_info, price_changes
 from layout import create_navbar, create_header, create_footer
 
 from app import app
@@ -195,18 +195,9 @@ def update_charts(fromDropdown, toDropdown, start_date, end_date):
         }
     }
     return price, candlestick
-
+    
 @app.callback(
     Output("card-logo","src"),
-    Input("fromDropdown", "value"),
-)
-
-def update_card(fromDropdown):
-    data = get_info(fromDropdown)['logo']
-    src = data.iloc[0]
-    return src
-
-@app.callback(
     Output("card-value1","children"),
     Output("card-value2","children"),
     Output("card-value3","children"),
@@ -217,8 +208,9 @@ def update_card(fromDropdown):
     Input("toDropdown","value"),
 )
 
-def update_card(fromDropdown,toDropdown):
-    values = price_changes(fromDropdown)
+def update_cards(fromDropdown,toDropdown):
+    logo = get_info(fromDropdown)['logo']
+    values = price_changes(fromDropdown,toDropdown)
     sign = get_fiat_list(toDropdown)
     cardvalue1 = values['close'].round(decimals=2).iloc[0]
     cardvalue2 = values['price_change'].round(decimals=2).iloc[0]
@@ -236,5 +228,6 @@ def update_card(fromDropdown,toDropdown):
     cardvalue1 = str(cardvalue1)+" "+sign
     cardvalue2 = str(cardvalue2)+" "+sign
     cardvalue3 = str(cardvalue3)+" "+(str("%"))
+    src = logo.iloc[0]
 
-    return cardvalue1,cardvalue2,cardvalue3,cardvalue4, cardcolor2, cardcolor3
+    return src,cardvalue1,cardvalue2,cardvalue3,cardvalue4, cardcolor2, cardcolor3
