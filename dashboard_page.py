@@ -4,7 +4,7 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input
 
-from data.data import get_coin_list, get_first_date, get_fiat_list, historical_data, get_info
+from data.data import get_coin_list, get_first_date, get_fiat_list, historical_data, get_info, price_conversion, price_changes
 from layout import create_navbar, create_header, create_footer
 
 from app import app
@@ -13,12 +13,11 @@ def create_dashboard():
     layout = html.Div([
         create_header(),
         create_navbar(),
-        create_footer(),
             dbc.Row(
                 [
                     dbc.Col(
                         [
-                            html.Div(children="Symbol", className="d-flex justify-content-center align-items-center"),
+                            html.Div(children="Coin Currency", className="d-flex justify-content-center my-3 font-weight-bold"),
                                 dcc.Dropdown(
                                     id="fromDropdown",
                                     options=[
@@ -29,7 +28,7 @@ def create_dashboard():
                                     clearable=True,
                                     className="dropdown d-flex justify-content-center",
                                 ),
-                            html.Div(children="Symbol2", className="d-flex justify-content-center"),
+                            html.Div(children="Fiat Currency", className="d-flex justify-content-center my-3 font-weight-bold"),
                                 dcc.Dropdown(
                                     id="toDropdown",
                                     options=[
@@ -40,7 +39,7 @@ def create_dashboard():
                                     clearable=True,
                                     className="dropdown d-flex justify-content-center",
                                 ),
-                            html.Div(children="Date", className="d-flex justify-content-center"),
+                            html.Div(children="Date Range", className="d-flex justify-content-center my-3 font-weight-bold"),
                                 dcc.DatePickerRange(
                                   id="datePicker",
                                   min_date_allowed=date(2013, 4, 28),
@@ -50,7 +49,7 @@ def create_dashboard():
                                   calendar_orientation='vertical',
                                   className="d-flex justify-content-center"
                                 ),
-                        ], className="col-md-3 content-border shadow rounded"),
+                        ], className="col-md-2 content-border shadow rounded"),
                     dbc.Col(
                         [
                             dbc.Row(
@@ -63,43 +62,41 @@ def create_dashboard():
                                                     [
                                                         dbc.Col(
                                                             [
-                                                                dbc.CardImg(
-                                                                    className="img-fluid rounded-start img-thumbnail"
-                                                                ),                                                      
-                                                            ], className="col-md-4"
+                                                                html.Img(id="card-logo", className="img-logo"),
+                                                            ], className="col-lg-4 col-sm d-flex align-items-center justify-content-center"
                                                         ),
                                                         dbc.Col(
                                                             [
-                                                                html.P("value", className="card-test"),
-                                                            ], className="col-md-8"
-                                                        )
-                                                    ], className="flex-fill"
+                                                                html.Div(id="card-value1", style={"color":"green"}, className="card-title  text-responsive"),
+                                                            ], className="col-lg-8 d-flex align-items-center justify-content-center"
+                                                        ),
+                                                    ],
                                                 )
-                                            ]
-                                        ),
-                                    ],className="col-sm m-2 "),
-                                    dbc.Card([
-                                        dbc.CardHeader("Total Sell", className="text-center"),
-                                        dbc.CardBody(
-                                            [
-                                                html.P("value", className="card-test"),
                                             ]
                                         ),
                                     ],className="col-sm m-2"),
                                     dbc.Card([
-                                        dbc.CardHeader("Total Buy", className="text-center"),
+                                        dbc.CardHeader("Since Last 24H", className="text-center"),
                                         dbc.CardBody(
                                             [
-                                                html.P("value", className="card-test"),
-                                            ]
+                                                html.P(id="card-value2", className="card-test text-responsive"),
+                                            ], className="d-flex align-items-center justify-content-center"
+                                        ),
+                                    ],className="col-sm m-2"),
+                                    dbc.Card([
+                                        dbc.CardHeader("Since Last 24H", className="text-center"),
+                                        dbc.CardBody(
+                                            [
+                                                html.P(id="card-value3", className="card-test text-responsive"),
+                                            ], className="d-flex align-items-center justify-content-center"
                                         ),
                                     ],className="col-sm m-2"),
                                     dbc.Card([
                                         dbc.CardHeader("Market Cap", className="text-center"),
                                         dbc.CardBody(
                                             [
-                                                html.P("value", className="card-test"),
-                                            ]
+                                                html.P(id="card-value4", className="card-test text-responsive"),
+                                            ], className="d-flex align-items-center justify-content-center"
                                         ),
                                     ],className="col-sm m-2"),
                                 ], className="gx-0 content-border shadow rounded"
@@ -109,7 +106,7 @@ def create_dashboard():
                                     id="price_plot", config={"displayModeBar": False},
                                 ),className="content-border shadow rounded p-2"
                             ),
-                        ]
+                        ], className="col-md-10 content-border shadow rounded"
                     ),
                 ], className="container-fluid content-border shadow rounded m-2"
             ),
@@ -118,6 +115,7 @@ def create_dashboard():
                     id="candlestick_plot", config={"displayModeBar": True, "scrollZoom": True, },
                 ),className="container-fluid content-border shadow rounded p-2 gx-0"
             ),
+            create_footer(),
         ], className='min-vh-100 d-flex flex-column'
     )
     return layout
@@ -182,7 +180,7 @@ def update_charts(fromDropdown, toDropdown, start_date, end_date):
             "hoverlabel" : dict(bgcolor='rgba(255,255,255,0.75)',font=dict(color='black')),
             "height" : 700,
             "xaxis" : {
-                "spikesnap" : "cursor",
+                #"spikesnap" : "cursor",
                 "spikedash": "longdashdot",
                 "spikethickness": 1,
                 "spikecolor": "rgb(0,176,246)",
@@ -197,3 +195,46 @@ def update_charts(fromDropdown, toDropdown, start_date, end_date):
         }
     }
     return price, candlestick
+
+@app.callback(
+    Output("card-logo","src"),
+    Input("fromDropdown", "value"),
+)
+
+def update_card(fromDropdown):
+    data = get_info(fromDropdown)['logo']
+    src = data.iloc[0]
+    return src
+
+@app.callback(
+    Output("card-value1","children"),
+    Output("card-value2","children"),
+    Output("card-value3","children"),
+    Output("card-value4","children"),
+    Output('card-value2',"style"),
+    Output("card-value3","style"),
+    Input("fromDropdown","value"),
+    Input("toDropdown","value"),
+)
+
+def update_card(fromDropdown,toDropdown):
+    values = price_changes(fromDropdown)
+    sign = get_fiat_list(toDropdown)
+    cardvalue1 = values['close'].round(decimals=2).iloc[0]
+    cardvalue2 = values['price_change'].round(decimals=2).iloc[0]
+    cardvalue3 = values['percent_change'].round(decimals=2).iloc[0]
+    cardvalue4 = values['high'].round(decimals=2).iloc[0]
+    if cardvalue2 > 0:
+        cardcolor2 = { 'color':'green' }
+    else:
+        cardcolor2= { 'color':'red' }
+
+    if cardvalue3 > 0:
+        cardcolor3 = { 'color':'green' }
+    else:
+        cardcolor3 = { 'color':'red' }
+    cardvalue1 = str(cardvalue1)+" "+sign
+    cardvalue2 = str(cardvalue2)+" "+sign
+    cardvalue3 = str(cardvalue3)+" "+(str("%"))
+
+    return cardvalue1,cardvalue2,cardvalue3,cardvalue4, cardcolor2, cardcolor3

@@ -31,9 +31,11 @@ def create_navbar():
 def create_footer():
     footer = html.Footer(
         [
-            html.Center([
-                html.H4("Footer", className="text-center p-1")
-            ], className="footer-style shadow")
-        ], className="mt-auto"
+            html.Center(children=[
+                html.H5([
+                    html.A("Github", className="text-white text-decoration-none", href="https://github.com/Thhprx3/Flask_IO"),
+                ])
+            ]),
+        ], className="footer-style shadow"
     )
     return footer
