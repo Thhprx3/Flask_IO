@@ -4,7 +4,7 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input
 
-from data.data import get_coin_list, get_first_date, get_fiat_list, historical_data, get_info, price_changes
+from data.data import get_coin_list, get_fiat_list, historical_data, get_info, price_changes
 from layout import create_navbar, create_header, create_footer
 
 from app import app
@@ -17,39 +17,44 @@ def create_dashboard():
                 [
                     dbc.Col(
                         [
-                            html.Div(children="Coin Currency", className="d-flex justify-content-center my-3 font-weight-bold"),
-                                dcc.Dropdown(
-                                    id="fromDropdown",
-                                    options=[
-                                        {"label": symbol, "value": symbol}
-                                        for symbol in get_coin_list()['symbol']
-                                    ],
-                                    value="BTC",
-                                    clearable=True,
-                                    className="dropdown d-flex justify-content-center",
-                                ),
-                            html.Div(children="Fiat Currency", className="d-flex justify-content-center my-3 font-weight-bold"),
-                                dcc.Dropdown(
-                                    id="toDropdown",
-                                    options=[
-                                        {"label" : symbol, "value" : symbol}
-                                        for symbol in get_fiat_list()['symbol']
-                                    ],
-                                    value="USD",
-                                    clearable=True,
-                                    className="dropdown d-flex justify-content-center",
-                                ),
-                            html.Div(children="Date Range", className="d-flex justify-content-center my-3 font-weight-bold"),
-                                dcc.DatePickerRange(
-                                  id="datePicker",
-                                  min_date_allowed=date(2013, 4, 28),
-                                  max_date_allowed=datetime.datetime.now().strftime("%Y-%m-%d"),
-                                  start_date=date(2022, 1, 1),
-                                  end_date=datetime.datetime.now().strftime("%Y-%m-%d"),
-                                  calendar_orientation='vertical',
-                                  className="d-flex justify-content-center"
-                                ),
-                        ], className="col-md-2 content-border shadow rounded"),
+                            html.Div(
+                                [
+                                    dbc.CardHeader("Options", className="text-center gx-2"),
+                                    html.Div(children="Coin Currency", className="d-flex justify-content-center my-3 font-weight-bold"),
+                                        dcc.Dropdown(
+                                            id="fromDropdown",
+                                            options=[
+                                                {"label": symbol, "value": symbol}
+                                                for symbol in get_coin_list()['symbol']
+                                            ],
+                                            value="BTC",
+                                            clearable=True,
+                                            className="dropdown d-flex justify-content-center",
+                                        ),
+                                    html.Div(children="Fiat Currency", className="d-flex justify-content-center my-3 font-weight-bold"),
+                                        dcc.Dropdown(
+                                            id="toDropdown",
+                                            options=[
+                                                {"label" : symbol, "value" : symbol}
+                                                for symbol in get_fiat_list()['symbol']
+                                            ],
+                                            value="USD",
+                                            clearable=True,
+                                            className="dropdown d-flex justify-content-center",
+                                        ),
+                                    html.Div(children="Date Range", className="d-flex justify-content-center my-3 font-weight-bold"),
+                                        dcc.DatePickerRange(
+                                        id="datePicker",
+                                        min_date_allowed=date(2013, 4, 28),
+                                        max_date_allowed=datetime.datetime.now().strftime("%Y-%m-%d"),
+                                        start_date=date(2022, 1, 1),
+                                        end_date=datetime.datetime.now().strftime("%Y-%m-%d"),
+                                        calendar_orientation='vertical',
+                                        className="d-flex justify-content-center"
+                                        ),
+                                ], className="cborder shadow h-100  tfix"
+                            ),
+                        ], className="col-md-2 gx-0 "),
                     dbc.Col(
                         [
                             dbc.Row(
@@ -74,7 +79,7 @@ def create_dashboard():
                                                 )
                                             ]
                                         ),
-                                    ],className="col-sm m-2"),
+                                    ],className="col-sm mb-2 rounded-0"),
                                     dbc.Card([
                                         dbc.CardHeader("Since Last 24H", className="text-center"),
                                         dbc.CardBody(
@@ -82,7 +87,7 @@ def create_dashboard():
                                                 html.P(id="card-value2", className="card-test text-responsive"),
                                             ], className="d-flex align-items-center justify-content-center"
                                         ),
-                                    ],className="col-sm m-2"),
+                                    ],className="col-sm mx-2 mb-2 rounded-0"),
                                     dbc.Card([
                                         dbc.CardHeader("Since Last 24H", className="text-center"),
                                         dbc.CardBody(
@@ -90,7 +95,7 @@ def create_dashboard():
                                                 html.P(id="card-value3", className="card-test text-responsive"),
                                             ], className="d-flex align-items-center justify-content-center"
                                         ),
-                                    ],className="col-sm m-2"),
+                                    ],className="col-sm mx-2 mb-2 rounded-0"),
                                     dbc.Card([
                                         dbc.CardHeader("Market Cap", className="text-center"),
                                         dbc.CardBody(
@@ -98,22 +103,25 @@ def create_dashboard():
                                                 html.P(id="card-value4", className="card-test text-responsive"),
                                             ], className="d-flex align-items-center justify-content-center"
                                         ),
-                                    ],className="col-sm m-2"),
-                                ], className="gx-0 content-border shadow rounded"
+                                    ],className="col-sm mb-2 rounded-0"),
+                                ], className="gx-0"
                             ),
                             dbc.Row(
-                                children=dcc.Graph(
-                                    id="price_plot", config={"displayModeBar": False},
-                                ),className="content-border shadow rounded p-2"
-                            ),
-                        ], className="col-md-10 content-border shadow rounded"
+                                [
+                                    html.Div(
+                                    children=dcc.Graph(
+                                        id="price_plot", config={"displayModeBar": False},className="", style={'width': '100%'})
+                                    )
+                                ],className="shadow cborder gx-0"
+                            )
+                        ], className="col-md-10 p-0"
                     ),
-                ], className="container-fluid content-border shadow rounded m-2"
+                ], className="container-fluid mx-auto mt-2 px-0"
             ),
             dbc.Row(
                 children=dcc.Graph(
-                    id="candlestick_plot", config={"displayModeBar": True, "scrollZoom": True, },
-                ),className="container-fluid content-border shadow rounded p-2 gx-0"
+                    id="candlestick_plot", config={"displayModeBar": True, "scrollZoom": True},
+                ),className="container-fluid cborder shadow mx-auto mt-2 gx-0", style={'width': '100%'}
             ),
             create_footer(),
         ], className='min-vh-100 d-flex flex-column'
@@ -176,6 +184,7 @@ def update_charts(fromDropdown, toDropdown, start_date, end_date):
             }
         ],
         "layout" : {
+            "title": 'Candlestick {} - {}'.format(fromDropdown,toDropdown),
             "hovermode" : "x unified",
             "hoverlabel" : dict(bgcolor='rgba(255,255,255,0.75)',font=dict(color='black')),
             "height" : 700,

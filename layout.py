@@ -17,8 +17,8 @@ def create_navbar():
         [
             dbc.Nav(
                 [
-                    dbc.NavItem(dbc.NavLink("Dashboard", active="exact", href="/"), className="nav-border-left"),
-                    dbc.NavItem(dbc.NavLink("Prediction", active="exact", href="/prediction"), className="nav-border-right"),
+                    dbc.NavItem(dbc.NavLink("Dashboard", active="exact", href="/")),
+                    dbc.NavItem(dbc.NavLink("Prediction", active="exact", href="/prediction")),
                 ],
                 #pills=True,
                 justified=True,
