@@ -9,6 +9,7 @@ from layout import create_navbar, create_header, create_footer
 
 from app import app
 
+#Main dashboard layout function 
 def create_dashboard():
     layout = html.Div([
         create_header(),
@@ -52,9 +53,9 @@ def create_dashboard():
                                         calendar_orientation='vertical',
                                         className="d-flex justify-content-center"
                                         ),
-                                ], className="cborder shadow h-100  tfix"
+                                ], className="cborder shadow h-100 me-3"
                             ),
-                        ], className="col-md-2 gx-0 "),
+                        ], className="col-md-2 gx-0"),
                     dbc.Col(
                         [
                             dbc.Row(
@@ -79,7 +80,7 @@ def create_dashboard():
                                                 )
                                             ]
                                         ),
-                                    ],className="col-sm mb-2 rounded-0"),
+                                    ],className="col-sm me-3 rounded-0"),
                                     dbc.Card([
                                         dbc.CardHeader("Since Last 24H", className="text-center"),
                                         dbc.CardBody(
@@ -87,7 +88,7 @@ def create_dashboard():
                                                 html.P(id="card-value2", className="card-test text-responsive"),
                                             ], className="d-flex align-items-center justify-content-center"
                                         ),
-                                    ],className="col-sm mx-2 mb-2 rounded-0"),
+                                    ],className="col-sm me-3 rounded-0"),
                                     dbc.Card([
                                         dbc.CardHeader("Since Last 24H", className="text-center"),
                                         dbc.CardBody(
@@ -95,7 +96,7 @@ def create_dashboard():
                                                 html.P(id="card-value3", className="card-test text-responsive"),
                                             ], className="d-flex align-items-center justify-content-center"
                                         ),
-                                    ],className="col-sm mx-2 mb-2 rounded-0"),
+                                    ],className="col-sm me-3 rounded-0"),
                                     dbc.Card([
                                         dbc.CardHeader("Market Cap", className="text-center"),
                                         dbc.CardBody(
@@ -103,8 +104,8 @@ def create_dashboard():
                                                 html.P(id="card-value4", className="card-test text-responsive"),
                                             ], className="d-flex align-items-center justify-content-center"
                                         ),
-                                    ],className="col-sm mb-2 rounded-0"),
-                                ], className="gx-0"
+                                    ],className="col-sm rounded-0"),
+                                ], className="gx-0 mb-2"
                             ),
                             dbc.Row(
                                 [
@@ -124,10 +125,11 @@ def create_dashboard():
                 ),className="container-fluid cborder shadow mx-auto mt-2 gx-0", style={'width': '100%'}
             ),
             create_footer(),
-        ], className='min-vh-100 d-flex flex-column'
+        ], className="min-vh-100 d-flex flex-column"
     )
     return layout
 
+#Charts callback function that check if values in dropdown menu are changed
 @app.callback(
     [Output("price_plot", "figure"),Output("candlestick_plot", "figure")],
     Input("fromDropdown", "value"),
@@ -136,6 +138,7 @@ def create_dashboard():
     Input("datePicker", "end_date"),
 )
 
+#Function to update charts based on values from callback function.
 def update_charts(fromDropdown, toDropdown, start_date, end_date):
 
     df = historical_data(toDropdown,fromDropdown,str(start_date),str(end_date))
@@ -204,7 +207,8 @@ def update_charts(fromDropdown, toDropdown, start_date, end_date):
         }
     }
     return price, candlestick
-    
+
+#Cards callbacks based on currency dropdown menu.
 @app.callback(
     Output("card-logo","src"),
     Output("card-value1","children"),
@@ -217,6 +221,7 @@ def update_charts(fromDropdown, toDropdown, start_date, end_date):
     Input("toDropdown","value"),
 )
 
+#Function that return all values based on the selected options in dropdown menu 
 def update_cards(fromDropdown,toDropdown):
     logo = get_info(fromDropdown)['logo']
     values = price_changes(fromDropdown,toDropdown)

@@ -38,6 +38,7 @@ header {
     width: 100%;
     background-color: var(--bg-brown);
     margin-top: 1%;
+    bottom: 0;
 }
 
 .modebar{
@@ -119,8 +120,4 @@ html::-webkit-scrollbar {
 
 .card {
     border: 1px solid var(--bg-gray);
-}
-
-.tfix {
-    margin-right: 2%;
 }

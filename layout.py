@@ -2,6 +2,7 @@ from dash import Input, Output
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 
+#Function to create header that is called from each page to avoid code duplication
 def create_header():
 
     header = html.Header(
@@ -12,6 +13,7 @@ def create_header():
     )
     return header
 
+#Function to create navbar that is called from each page to avoid code duplication
 def create_navbar():
     navbar = html.Nav(
         [
@@ -28,6 +30,7 @@ def create_navbar():
     )
     return navbar
 
+#Function to create footer that is called from each page to avoid code duplication
 def create_footer():
     footer = html.Footer(
         [
