@@ -1,69 +1,101 @@
-data = historical_data('USD','bitcoin','2013-01-01','2022-01-01')
-data['timestamp'] = pd.to_datetime(data['timestamp']).dt.date
-dataframe = pd.DataFrame(data=data, index=[data.timestamp], columns=['close'])
-close_data = data.filter(['close'])
-close_dataset = close_data.values
-close_dataset = close_dataset.astype('float32')
+import pandas as pd
+import math
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_squared_error
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.callbacks import CSVLogger
 
 scaler = MinMaxScaler(feature_range=(0,1))
 
-close_dataset = scaler.fit_transform(close_dataset)
-Training_size = math.ceil(len(close_dataset)*0.8)
-Testing_size = len(close_dataset) - Training_size
+previous_ts=3
 
-print("Trainging length: "+str(Training_size))
-print("Testing length: "+str(Testing_size))
+def prepare_data(data):
+    data['timestamp'] = pd.to_datetime(data['timestamp']).dt.date
+    dataframe = pd.DataFrame(data=data, index=[data.timestamp], columns=['close'])
+    close_data = data.filter(['close'])
+    close_dataset = close_data.values
+    close_dataset = close_dataset.astype('float32')
+    #normalizing to scale input data
+    #scaler = MinMaxScaler(feature_range=(0,1))
+    close_dataset = scaler.fit_transform(close_dataset)
+    return close_dataset
 
-train = close_dataset[0:Training_size,:]
-test = close_dataset[Training_size:len(close_dataset),:]
-look_back = 3
-
-Xtrain = []
-Ytrain = []
-Xtest = []
-Ytest = []
-
-#Training data
-for i in range(len(train)-look_back-1):
-    x = train[i:(i+look_back),0]
-    Xtrain.append(x)
-    Ytrain.append(train[i+look_back, 0])
-
-#Testing data
-for i in range(len(test)-look_back-1):
-    x = test[i:(i+look_back),0]
-    Xtest.append(x)
-    Ytest.append(test[i+look_back, 0])
-
-Xtrain = np.array(Xtrain)
-Xtest= np.array(Xtest)
-Ytrain = np.array(Ytrain)
-Ytest = np.array(Ytest)
-
-Xtrain = np.reshape(Xtrain, (Xtrain.shape[0], 1, Xtrain.shape[1]))
-Xtest = np.reshape(Xtest, (Xtest.shape[0], 1, Xtest.shape[1]))
+def split(close_dataset):
+    #splitting data into 80% of train data and 20% of test data
+    Training_size = math.ceil(len(close_dataset)*0.8)
+    Testing_size = len(close_dataset) - Training_size
+    train = close_dataset[0:Training_size,:]
+    test = close_dataset[Training_size:len(close_dataset),:]
+    return train, test
 
 
-#LSTM Network
-model = Sequential()
-model.add(LSTM(50, return_sequences=True, input_shape=(1, look_back)))
-model.add(Dropout(rate=0.2))
-model.add(LSTM(50, return_sequences=False))
-model.add(Dropout(rate=0.2))
-model.add(Dense(1))
-model.compile(loss="mse", optimizer="adam", metrics=['mae'])
+def model_data(train,test):
+    Xtrain = []
+    Ytrain = []
+    Xtest = []
+    Ytest = []
 
+    #Training data
+    for i in range(len(train)-previous_ts-1):
+        x = train[i:(i+previous_ts),0]
+        Xtrain.append(x)
+        Ytrain.append(train[i+previous_ts, 0])
 
-model.fit(Xtrain, Ytrain, epochs=100, batch_size=32, verbose=2)
+    #Testing data
+    for i in range(len(test)-previous_ts-1):
+        x = test[i:(i+previous_ts),0]
+        Xtest.append(x)
+        Ytest.append(test[i+previous_ts, 0])
 
+    Xtrain = np.array(Xtrain)
+    Xtest= np.array(Xtest)
+    Ytrain = np.array(Ytrain)
+    Ytest = np.array(Ytest)
 
+    Xtrain = np.reshape(Xtrain, (Xtrain.shape[0], 1, Xtrain.shape[1]))
+    Xtest = np.reshape(Xtest, (Xtest.shape[0], 1, Xtest.shape[1]))
 
-from sklearn.metrics import mean_squared_error
+    return Xtrain, Ytrain, Xtest, Ytest
 
-TrainPrediction = model.predict(Xtrain)
-TestPrediction = model.predict(Xtest)
+def fit_model(Xtrain, Ytrain, Xtest, Ytest):
+    #LSTM Network
+    model = Sequential()
+    model.add(LSTM(255, return_sequences=True, input_shape=(1, previous_ts)))
+    model.add(Dropout(rate=0.2))
+    model.add(LSTM(255, return_sequences=True))
+    model.add(Dropout(rate=0.2))
+    model.add(LSTM(255, return_sequences=False))
+    model.add(Dropout(rate=0.2))
+    model.add(Dense(1))
+    model.compile(loss="mse", optimizer="adam", metrics=['mae'])
 
-TrainPrediction = scaler.inverse_transform(TrainPrediction)
-Ytrain = scaler.inverse_transform([Ytrain])
-TestPrediction = scaler.inverse_transform(TestPrediction)
-Ytest = scaler.inverse_transform([Ytest])
+    csv_logger = CSVLogger('run.csv', append=True, separator=',')
+    model.fit(Xtrain, Ytrain, validation_data=(Xtest,Ytest), epochs=50, batch_size=16, verbose=2, callbacks=[csv_logger])
+    return model
+
+def predict_values(model, Xtrain, Ytrain, Xtest, Ytest, close_dataset):  
+    TrainPrediction = model.predict(Xtrain)
+    TestPrediction = model.predict(Xtest)
+    obj = scaler.fit(close_dataset)
+    TrainPrediction = obj.inverse_transform(TrainPrediction)
+    Ytrain = scaler.inverse_transform([Ytrain])
+    TestPrediction = obj.inverse_transform(TestPrediction)
+    Ytest = scaler.inverse_transform([Ytest])
+    TrainScore = math.sqrt(mean_squared_error(Ytrain[0], TrainPrediction[:,0]))
+    TestScore = math.sqrt(mean_squared_error(Ytest[0], TestPrediction[:,0]))
+    return TrainPrediction, Ytrain, TestPrediction, Ytest, TrainScore, TestScore
+
+def plot_data(close_dataset, TrainPrediction, TestPrediction):
+    scaler = MinMaxScaler(feature_range=(0,1))
+    trainPredictPlot = np.empty_like(close_dataset)
+    trainPredictPlot[:, :] = np.nan
+    trainPredictPlot[previous_ts:len(TrainPrediction)+previous_ts, :] = TrainPrediction
+    testPredictPlot = np.empty_like(close_dataset)
+    testPredictPlot[:, :] = np.nan
+    testPredictPlot[len(TrainPrediction)+(previous_ts*2)+1:len(close_dataset)-1, :] = TestPrediction
+    
+    inverted_data = scaler.fit(close_dataset)
+    inverted_dataset = inverted_data.inverse_transform(close_dataset)
+    return inverted_dataset, trainPredictPlot, testPredictPlot
