@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8080
 
 # replace APP_NAME with module name
-CMD ["gunicorn", "--bind", ":8080", "--workers", "2", "start_server:app"]
+CMD ["gunicorn", "--bind", ":8080", "--workers", "2", "start_server:app.server"]
