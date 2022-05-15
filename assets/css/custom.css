@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+*{
+    font-family: 'Poppins', sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+:root{
+    --bg-light: #C9C9C9;
+    --bg-white: #FCFCFC;
+    --bg-gray: #858585;
+    --bg-pink: #FDB1B1;
+    --bg-brown: #7D5757;
+}
+
+header {
+    background-color: var(--bg-light);
+    color: var(--bg-brown);
+}
+
+.nav-border {
+    border-bottom: 1px solid var(--bg-gray);
+}
+
+.nav-link, nav-link:hover{
+    color: var(--bg-brown);
+}
+
+.nav-link.active {
+    color: var(--bg-white);
+    border-top: 1px solid var(--bg-gray);
+    border-left: 1px solid var(--bg-gray);
+    border-right: 1px solid var(--bg-gray);
+    border-bottom: 0;
+    background-color: var(--bg-brown);
+}
+.footer-style {
+    width: 100%;
+    background-color: var(--bg-brown);
+    margin-top: 1%;
+    bottom: 0;
+}
+
+.modebar{
+    display: none !important;
+}
+
+.container-fluid {
+    max-width: 99%;
+}
+
+.cborder {
+    border: 1px solid var(--bg-gray);
+}
+
+.card {
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+}
+
+#card-logo {
+    height: auto;
+    width: auto;
+}
+
+.card-body {
+    flex: 1 1 auto;
+}
+
+.card-group .card {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+html::-webkit-scrollbar {
+    display: none;
+}
+
+.text-responsive {
+    font-size: 0.5rem;
+}
+
+@media (min-width: 900px) {
+    .text-responsive {
+        font-size: 0.75rem;
+    }
+    .img-logo {
+        max-height: 50px;
+        max-width: 50px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .text-responsive {
+      font-size: 1rem;
+    }
+    .img-logo {
+        max-height: 64px;
+        max-width: 64px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .text-responsive {
+      font-size: 2rem;
+    }
+}
+
+.Select-control {
+    width: 280px;
+    text-align: center;
+}
+
+.card-header:first-child {
+    border-radius: 0;
+    color: var(--bg-white)!important;
+    background-color: var(--bg-gray)!important;
+}
+
+.card {
+    border: 1px solid var(--bg-gray);
+}
