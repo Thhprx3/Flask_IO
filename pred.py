@@ -59,43 +59,53 @@ def model_data(train,test):
 
     return Xtrain, Ytrain, Xtest, Ytest
 
-def fit_model(Xtrain, Ytrain, Xtest, Ytest):
+def fit_model(Xtrain, Ytrain, Xtest, Ytest, dropdownNeurons, dropdownSteps):
     #LSTM Network
     model = Sequential()
-    model.add(LSTM(255, return_sequences=True, input_shape=(1, previous_ts)))
+    model.add(LSTM(dropdownNeurons, return_sequences=True, input_shape=(1, previous_ts)))
     model.add(Dropout(rate=0.2))
-    model.add(LSTM(255, return_sequences=True))
+    model.add(LSTM(dropdownNeurons, return_sequences=True))
     model.add(Dropout(rate=0.2))
-    model.add(LSTM(255, return_sequences=False))
+    model.add(LSTM(dropdownNeurons, return_sequences=False))
     model.add(Dropout(rate=0.2))
     model.add(Dense(1))
     model.compile(loss="mse", optimizer="adam", metrics=['mae'])
 
     csv_logger = CSVLogger('run.csv', append=True, separator=',')
-    model.fit(Xtrain, Ytrain, validation_data=(Xtest,Ytest), epochs=50, batch_size=16, verbose=2, callbacks=[csv_logger])
+    model.fit(Xtrain, Ytrain, validation_data=(Xtest,Ytest), epochs=dropdownSteps, batch_size=16, verbose=2, callbacks=[csv_logger])
     return model
 
 def predict_values(model, Xtrain, Ytrain, Xtest, Ytest, close_dataset):  
     TrainPrediction = model.predict(Xtrain)
     TestPrediction = model.predict(Xtest)
-    obj = scaler.fit(close_dataset)
-    TrainPrediction = obj.inverse_transform(TrainPrediction)
+    TrainPrediction = scaler.inverse_transform(TrainPrediction)
     Ytrain = scaler.inverse_transform([Ytrain])
-    TestPrediction = obj.inverse_transform(TestPrediction)
+    TestPrediction = scaler.inverse_transform(TestPrediction)
     Ytest = scaler.inverse_transform([Ytest])
     TrainScore = math.sqrt(mean_squared_error(Ytrain[0], TrainPrediction[:,0]))
     TestScore = math.sqrt(mean_squared_error(Ytest[0], TestPrediction[:,0]))
     return TrainPrediction, Ytrain, TestPrediction, Ytest, TrainScore, TestScore
 
 def plot_data(close_dataset, TrainPrediction, TestPrediction):
-    scaler = MinMaxScaler(feature_range=(0,1))
     trainPredictPlot = np.empty_like(close_dataset)
     trainPredictPlot[:, :] = np.nan
     trainPredictPlot[previous_ts:len(TrainPrediction)+previous_ts, :] = TrainPrediction
     testPredictPlot = np.empty_like(close_dataset)
     testPredictPlot[:, :] = np.nan
     testPredictPlot[len(TrainPrediction)+(previous_ts*2)+1:len(close_dataset)-1, :] = TestPrediction
-    
-    inverted_data = scaler.fit(close_dataset)
-    inverted_dataset = inverted_data.inverse_transform(close_dataset)
+    inverted_dataset = scaler.inverse_transform(close_dataset)
     return inverted_dataset, trainPredictPlot, testPredictPlot
+
+
+def predict(num_prediction, model, close_dataset):
+    prediction_list = close_dataset[-previous_ts:]
+    
+    for _ in range(num_prediction):
+        x = prediction_list[-previous_ts:]
+        x = x.reshape(1, 1, previous_ts)
+        out = model.predict(x)
+        inversed_data = scaler.inverse_transform(out)
+        prediction_list = np.append(prediction_list, inversed_data)
+    prediction_list = prediction_list[previous_ts-1:]
+        
+    return prediction_list[1]
